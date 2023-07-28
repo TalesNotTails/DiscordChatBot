@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/core": "^0.6.0"
+    "@discordjs/core": "^0.6.0",
+    "spotify-web-api-node": "^5.0.2"
   }
 }
