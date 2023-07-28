@@ -1,9 +1,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+const { Configuration, OpenAIApi } = require('openai');
+
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits, Message, IntentsBitField } = require('discord.js');
-const { token } = require('./config.json');
+const { token, channelID } = require('./config.json');
 
 // Create a new client instance
 const client = new Client({ 
@@ -69,9 +71,21 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
-client.on("messageCreate", (message) => {
+client.on("messageCreate", async (message) => {
 	console.log(message);
-})
+	if (message.author.bot) return;
+	if (message.channel.id !== channelID) return;
+	if (message.content.startsWith('!')) return;
+
+	let conversationLog = [{ role: 'system', content: "You are a sarcastic chatbot." }];
+
+	conversationLog.push({
+		role: "user",
+		content: message.content,
+	});
+
+	await message.channel.sendTyping();
+});
 
 // Log in to Discord with your client's token
 client.login(token);
