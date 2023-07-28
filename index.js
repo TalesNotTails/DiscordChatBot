@@ -2,11 +2,17 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 // Require the necessary discord.js classes
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, Message, IntentsBitField } = require('discord.js');
 const { token } = require('./config.json');
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ 
+	intents: [
+		GatewayIntentBits.Guilds,
+		IntentsBitField.Flags.Guilds,
+		IntentsBitField.Flags.GuildMessages,
+		IntentsBitField.Flags.MessageContent,
+	] });
 
 client.commands = new Collection();
 
@@ -62,6 +68,10 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
+
+client.on("messageCreate", (message) => {
+	console.log(message);
+})
 
 // Log in to Discord with your client's token
 client.login(token);
