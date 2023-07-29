@@ -5,10 +5,16 @@ const { Configuration, OpenAIApi } = require('openai');
 
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits, Message, IntentsBitField } = require('discord.js');
-const { token, channelID } = require('./config.json');
+const { token, channelID, openaikey } = require('./config.json');
+
+const configuration = new Configuration({
+	apiKey: openaikey,
+});
+
+const openai = new OpenAIApi(configuration);
 
 // Create a new client instance
-const client = new Client({ 
+const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
 		IntentsBitField.Flags.Guilds,
@@ -71,20 +77,27 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
-client.on("messageCreate", async (message) => {
+client.on('messageCreate', async (message) => {
 	console.log(message);
 	if (message.author.bot) return;
 	if (message.channel.id !== channelID) return;
 	if (message.content.startsWith('!')) return;
 
-	let conversationLog = [{ role: 'system', content: "You are a sarcastic chatbot." }];
+	let conversationLog = [{ role: 'system', content: 'You are a sarcastic chatbot.' }];
 
 	conversationLog.push({
-		role: "user",
+		role: 'user',
 		content: message.content,
 	});
 
 	await message.channel.sendTyping();
+
+	const result = await openai.createChatCompletion({
+		model: 'gpt-3.5-turbo',
+		messages: conversationLog,
+	});
+
+	message.reply(result.data.choices[0].message);
 });
 
 // Log in to Discord with your client's token
