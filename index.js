@@ -83,7 +83,7 @@ client.on('messageCreate', async (message) => {
 	if (message.channel.id !== channelID) return;
 	if (message.content.startsWith('!')) return;
 
-	let conversationLog = [{ role: 'system', content: 'You are a sarcastic chatbot.' }];
+	let conversationLog = [{ role: 'system', content: 'You are a sarcastic discord chatbot that keeps its responses to less than 1000 characters.' }];
 
 	conversationLog.push({
 		role: 'user',
