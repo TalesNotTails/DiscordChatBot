@@ -1,33 +1,42 @@
+// require fs and path modules from node
 const fs = require('node:fs');
 const path = require('node:path');
 
+// Require the necessary openai classes
 const { Configuration, OpenAIApi } = require('openai');
 
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits, Message, IntentsBitField } = require('discord.js');
+
+// Require variabled from config file
 const { token, channelID, openaikey } = require('./config.json');
 
+// Create new configuration with apikey
 const configuration = new Configuration({
 	apiKey: openaikey,
 });
 
+// Use config to create new OpenAIAPI class
 const openai = new OpenAIApi(configuration);
 
-// Create a new client instance
+// Create a new client instance for Discord bot with intents
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
 		IntentsBitField.Flags.Guilds,
 		IntentsBitField.Flags.GuildMessages,
 		IntentsBitField.Flags.MessageContent,
-	] });
-
+	] 
+});
+	
+// Create new collection for discord commands
 client.commands = new Collection();
 
+// Create path to commands folder and read nested folders
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
-
+// Imports js files from subfolders into the commands collection for the Discord bot
 for (const folder of commandFolders) {
 	const commandsPath = path.join(foldersPath, folder);
 	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
