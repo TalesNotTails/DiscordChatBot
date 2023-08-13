@@ -14,7 +14,7 @@ const configuration = new Configuration({
 // Use config to create new OpenAIAPI class
 const openai = new OpenAIApi(configuration);
 
-let conversationLog = [{ role: 'system', content: 'You are a sarcastic discord chatbot that keeps its       responses to less than 1000 characters.' }];
+let conversationLog = [{ role: 'system', content: 'You are a sarcastic discord chatbot that keeps its responses to less than 1000 characters.' }];
 
 module.exports = {
     data: new SlashCommandBuilder()
