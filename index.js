@@ -2,22 +2,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-// Require the necessary openai classes
-const { Configuration, OpenAIApi } = require('openai');
-
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits, Message, IntentsBitField } = require('discord.js');
 
 // Require variabled from config file
-const { token, channelID, openaikey } = require('./config.json');
-
-// Create new configuration with apikey
-const configuration = new Configuration({
-	apiKey: openaikey,
-});
-
-// Use config to create new OpenAIAPI class
-const openai = new OpenAIApi(configuration);
+const { token, channelID } = require('./config.json');
 
 // Create a new client instance for Discord bot with intents
 const client = new Client({
@@ -63,7 +52,7 @@ client.once(Events.ClientReady, c => {
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
-	// console.log(interaction)
+	console.log(interaction)
 
 	const command = interaction.client.commands.get(interaction.commandName);
 
@@ -86,29 +75,6 @@ client.on(Events.InteractionCreate, async interaction => {
 			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 		}
 	}
-});
-
-client.on('messageCreate', async (message) => {
-	// console.log(message);
-	if (message.author.bot) return;
-	if (message.channel.id !== channelID) return;
-	if (message.content.startsWith('!')) return;
-
-	let conversationLog = [{ role: 'system', content: 'You are a sarcastic discord chatbot that keeps its responses to less than 1000 characters.' }];
-
-	conversationLog.push({
-		role: 'user',
-		content: message.content,
-	});
-
-	await message.channel.sendTyping();
-
-	const result = await openai.createChatCompletion({
-		model: 'gpt-3.5-turbo',
-		messages: conversationLog,
-	});
-
-	message.reply(result.data.choices[0].message);
 });
 
 // Log in to Discord with your client's token
