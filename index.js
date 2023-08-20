@@ -16,9 +16,9 @@ const client = new Client({
 		IntentsBitField.Flags.GuildVoiceStates,
 		IntentsBitField.Flags.GuildMessages,
 		IntentsBitField.Flags.MessageContent,
-	] 
+	],
 });
-	
+
 // Create new collection for discord commands
 client.commands = new Collection();
 
