@@ -3,6 +3,9 @@ const { SlashCommandBuilder } = require('discord.js');
 const { VoiceChannel } = require('discord.js');
 const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, createAudioPlayer } = require('@discordjs/voice');
 
+// import access token and songDetails function from index.js
+const { accessToken, getSongDetailsFromLink } = require('../../index.js');
+
 const ytdl = require('ytdl-core');
 
 module.exports = {
@@ -14,35 +17,52 @@ module.exports = {
 				.setDescription('Enter your input here')
 				.setRequired(true)),
 	async execute(interaction) {
+
 		const userInput = interaction.options.getString('input');
 
-		const voiceChannel = interaction.member.voice.channel;
-		if (!voiceChannel || !(voiceChannel instanceof VoiceChannel)) return interaction.reply('You need to be in a voice channel first!');
+		if (userInput.includes('spotify.com')) {
+			console.log('Spotify link detected');
+			const songDetails = getSongDetailsFromLink(userInput, accessToken);
+			console.log(songDetails);
+		}
 
-		const connection = joinVoiceChannel({
-			channelId: voiceChannel.id,
-			guildId: voiceChannel.guild.id,
-			adapterCreator: voiceChannel.guild.voiceAdapterCreator,
-		});
+		if (userInput.includes('youtu.be')) {
 
-		const stream = ytdl(userInput, { filter: 'audioonly' });
-		const resource = createAudioResource(stream);
-		const player = createAudioPlayer();
+			console.log('YouTube link detected');
 
-		player.play(resource);
-		connection.subscribe(player);
+			const voiceChannel = interaction.member.voice.channel;
+			if (!voiceChannel || !(voiceChannel instanceof VoiceChannel)) return interaction.reply('You need to be in a voice channel first!');
 
-		player.on(AudioPlayerStatus.Idle, () => {
-			connection.destroy(); // Close the connection after playback has ended
-		});
+			const connection = joinVoiceChannel({
+				channelId: voiceChannel.id,
+				guildId: voiceChannel.guild.id,
+				adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+			});
 
-		stream.on('error', (error) => {
-			console.error('Stream error:', error);
-			connection.destroy();
-			interaction.reply('Error playing the stream. Please try again.');
-		});
+			const stream = ytdl(userInput, { filter: 'audioonly' });
+			const resource = createAudioResource(stream);
+			const player = createAudioPlayer();
 
-		interaction.reply(`Playing: ${userInput}`);
+			player.play(resource);
+			connection.subscribe(player);
+
+			// Close the connection after playback has ended
+			player.on(AudioPlayerStatus.Idle, () => {
+				connection.destroy();
+			});
+
+			stream.on('error', (error) => {
+				console.error('Stream error:', error);
+				connection.destroy();
+				interaction.reply('Error playing the stream. Please try again.');
+			});
+
+			interaction.reply(`Playing: ${userInput}`);
+		}
+
+		else {
+			console.log('Youtube link detected');
+		}
 
 		// await interaction.reply();
 	},
