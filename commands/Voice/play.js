@@ -21,7 +21,7 @@ module.exports = {
 
 		const userInput = interaction.options.getString('input');
 
-		if (userInput.includes('youtu.be')) {
+		if (userInput.includes('youtu.be') || userInput.includes('youtube.com')) {
 
 			console.log('YouTube link detected');
 
@@ -56,7 +56,7 @@ module.exports = {
 		}
 
 		else {
-			console.log('Please enter a youtube');
+			console.log('Please enter a youtube link');
 		}
 
 		// await interaction.reply();
