@@ -1,44 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
-
 const { VoiceChannel } = require('discord.js');
 const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, createAudioPlayer } = require('@discordjs/voice');
-
-const fetch = require('node-fetch');
-
 const ytdl = require('ytdl-core');
-
-const { spotifyID, spotifyKey } = require('../../config.json');
-
-async function getSpotifyAccessToken(clientId, clientSecret) {
-	const creds = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-	const response = await fetch('https://accounts.spotify.com/api/token', {
-		method: 'POST',
-		headers: {
-			'Authorization': `Basic ${creds}`,
-			'Content-Type': 'application/x-www-form-urlencoded',
-		},
-		body: 'grant_type=client_credentials',
-	});
-
-	const data = await response.json();
-	console.log(data.accessToken);
-	return data.access_token;
-}
-
-async function getSongDetailsFromLink(link, accessToken) {
-	// Extract the track ID from the Spotify link
-	const trackId = link.split('track/')[1].split('?')[0];
-	const response = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
-		headers: {
-			'Authorization': `Bearer ${accessToken}`,
-		},
-	});
-
-	const data = await response.json();
-	return data;
-}
-
-const accessToken = getSpotifyAccessToken(spotifyID, spotifyKey);
+const { mediaChannelID } = require('../../config.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -50,13 +14,12 @@ module.exports = {
 				.setRequired(true)),
 	async execute(interaction) {
 
-		const userInput = interaction.options.getString('input');
-
-		if (userInput.includes('spotify.com')) {
-			console.log('Spotify link detected');
-			const songDetails = await getSongDetailsFromLink(userInput, accessToken);
-			console.log(songDetails);
+		if (interaction.channel.id !== mediaChannelID) {
+			await interaction.reply('Please enter prompt in medial playback channel');
+			return;
 		}
+
+		const userInput = interaction.options.getString('input');
 
 		if (userInput.includes('youtu.be')) {
 
@@ -93,7 +56,7 @@ module.exports = {
 		}
 
 		else {
-			console.log('Please enter a youtube or spotify link');
+			console.log('Please enter a youtube');
 		}
 
 		// await interaction.reply();

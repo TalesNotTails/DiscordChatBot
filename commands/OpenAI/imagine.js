@@ -4,7 +4,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const { Configuration, OpenAIApi } = require('openai');
 
 // Require variabled from config file
-const { openaikey } = require('../../config.json');
+const { openaikey, imageChannelID } = require('../../config.json');
 
 // Create new configuration with apikey
 const configuration = new Configuration({
@@ -23,6 +23,12 @@ module.exports = {
 				.setDescription('Enter your input here')
 				.setRequired(true)),
 	async execute(interaction) {
+
+		if (interaction.channel.id !== imageChannelID) {
+			await interaction.reply('Please enter prompt in image generation channel');
+			return;
+		}
+
 		try {
 			const userInput = interaction.options.getString('input');
 

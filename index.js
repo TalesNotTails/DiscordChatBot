@@ -3,11 +3,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 // Require the necessary discord.js classes
-const { Client, Collection, Events, GatewayIntentBits, Message, IntentsBitField } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, IntentsBitField } = require('discord.js');
 
 // Require variables from config file
 const { token } = require('./config.json');
-const exp = require('node:constants');
 
 // Create a new client instance for Discord bot with intents
 const client = new Client({
@@ -73,6 +72,10 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
+
+client.on('messageCreate', async (message) => {
+	console.log(message);
+});
 // When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, c => {
