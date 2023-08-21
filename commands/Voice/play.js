@@ -21,6 +21,7 @@ async function getSpotifyAccessToken(clientId, clientSecret) {
 	});
 
 	const data = await response.json();
+	console.log(data.accessToken);
 	return data.access_token;
 }
 
