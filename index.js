@@ -2,13 +2,12 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const fetch = require('node-fetch');
-
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits, Message, IntentsBitField } = require('discord.js');
 
 // Require variables from config file
-const { token, spotifyID, spotifyKey } = require('./config.json');
+const { token } = require('./config.json');
+const exp = require('node:constants');
 
 // Create a new client instance for Discord bot with intents
 const client = new Client({
@@ -46,36 +45,6 @@ for (const folder of commandFolders) {
 	}
 }
 
-async function getSpotifyAccessToken(clientId, clientSecret) {
-	const creds = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-	const response = await fetch('https://accounts.spotify.com/api/token', {
-		method: 'POST',
-		headers: {
-			'Authorization': `Basic ${creds}`,
-			'Content-Type': 'application/x-www-form-urlencoded'
-		},
-		body: 'grant_type=client_credentials'
-	});
-
-	const data = await response.json();
-	return data.access_token;
-}
-
-async function getSongDetailsFromLink(link, accessToken) {
-	// Extract the track ID from the Spotify link
-	const trackId = link.split('track/')[1].split('?')[0];
-	const response = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
-		headers: {
-			'Authorization': `Bearer ${accessToken}`,
-		},
-	});
-
-	const data = await response.json();
-	return data;
-}
-
-const accessToken = getSpotifyAccessToken(spotifyID, spotifyKey);
-
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
@@ -112,8 +81,3 @@ client.once(Events.ClientReady, c => {
 
 // Log in to Discord with your client's token
 client.login(token);
-
-module.exports = {
-	accessToken,
-	getSongDetailsFromLink,
-};
