@@ -53,7 +53,7 @@ module.exports = {
 
 		if (userInput.includes('spotify.com')) {
 			console.log('Spotify link detected');
-			const songDetails = getSongDetailsFromLink(userInput, accessToken);
+			const songDetails = await getSongDetailsFromLink(userInput, accessToken);
 			console.log(songDetails);
 		}
 
